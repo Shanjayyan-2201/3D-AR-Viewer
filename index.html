@@ -8,35 +8,11 @@
     <a-scene embedded arjs>
         <!-- Assets -->
         <a-assets>
-            <a-asset-item id="model" src="<!DOCTYPE html>
-<html>
-<head>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js"></script>
-</head>
-<body>
-    <a-scene embedded arjs>
-        <!-- Assets -->
-        <a-assets>
-            <a-asset-item id="model" src="https://drive.google.com/file/d/11RrEBslTldYkNc44q4WQ382sJtWW_6Qf/view?usp=sharing/Textured_mesh_1.gltf"></a-asset-item>
+            <a-asset-item id="model" src="./Textured_mesh_1.gltf" crossorigin="anonymous"></a-asset-item>
         </a-assets>
 
         <!-- 3D Model -->
         <a-entity gltf-model="#model" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
-        
-        <!-- AR Marker (for marker-based AR) -->
-        <a-marker-camera preset="hiro"></a-marker-camera>
-    </a-scene>
-</body>
-</html>
-" crossorigin="anonymous"></a-asset-item>
-        </a-assets>
-
-        <!-- 3D Model -->
-        <a-entity gltf-model="#model" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
-
-        <!-- Test Box (Optional) -->
-        <a-entity geometry="primitive: box" material="color: red" position="0 0.5 0"></a-entity>
 
         <!-- AR Marker -->
         <a-marker-camera preset="hiro"></a-marker-camera>
