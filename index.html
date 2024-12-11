@@ -8,14 +8,16 @@
     <a-scene embedded arjs>
         <!-- Assets -->
         <a-assets>
-            <a-asset-item id="model" src="<a-asset-item id="model" src="https://drive.google.com/uc?export=download&id=1hIvX12IUu7TOt91xQO8_mmik2dHMdied"></a-asset-item>
-"></a-asset-item>
+            <a-asset-item id="model" src="https://drive.google.com/file/d/1hIvX12IUu7TOt91xQO8_mmik2dHMdied/view?usp=drive_link" crossorigin="anonymous"></a-asset-item>
         </a-assets>
 
         <!-- 3D Model -->
         <a-entity gltf-model="#model" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
-        
-        <!-- AR Marker (for marker-based AR) -->
+
+        <!-- Test Box (Optional) -->
+        <a-entity geometry="primitive: box" material="color: red" position="0 0.5 0"></a-entity>
+
+        <!-- AR Marker -->
         <a-marker-camera preset="hiro"></a-marker-camera>
     </a-scene>
 </body>
