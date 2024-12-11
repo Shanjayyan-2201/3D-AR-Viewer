@@ -9,14 +9,31 @@
         <!-- Assets -->
         <a-assets>
             <a-asset-item id="model" src="./Textured_mesh_1.gltf"></a-asset-item>
-
         </a-assets>
 
         <!-- 3D Model -->
-        <a-entity gltf-model="#model" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
+        <a-entity id="modelEntity" gltf-model="#model" position="0 0 0"></a-entity>
 
         <!-- AR Marker -->
         <a-marker-camera preset="hiro"></a-marker-camera>
     </a-scene>
+
+    <script>
+        // Wait for the model to load
+        document.querySelector("#modelEntity").addEventListener("model-loaded", () => {
+            const entity = document.querySelector("#modelEntity");
+
+            // Get screen dimensions
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+
+            // Adjust scale dynamically (adjust the multiplier as needed)
+            const scaleFactor = Math.min(screenWidth, screenHeight) / 1000; // Scale factor based on screen size
+            entity.setAttribute("scale", `${scaleFactor} ${scaleFactor} ${scaleFactor}`);
+
+            // Optional: Adjust position if needed (e.g., centering the model)
+            entity.setAttribute("position", "0 0 0");
+        });
+    </script>
 </body>
 </html>
