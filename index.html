@@ -12,12 +12,12 @@
             <a-asset-item id="model" src="./result.gltf"></a-asset-item>
         </a-assets>
 
-        <!-- 3D Model (Hidden Initially) -->
+        <!-- 3D Model (Partially visible initially) -->
         <a-entity id="modelEntity" 
                   gltf-model="#model" 
-                  visible="false" 
-                  scale="1 1 1" 
-                  rotation="0 0 0"
+                  position="0 0 0"
+                  scale="1 1 1"
+                  material="opacity: 0.5; transparent: true" 
                   gesture-handler>
         </a-entity>
 
@@ -29,22 +29,22 @@
         document.querySelector("a-scene").addEventListener("click", (event) => {
             const modelEntity = document.querySelector("#modelEntity");
 
-            // Check for intersection or fallback to default placement
+            // Step 1: Get the clicked position in the scene
             const intersectedPoint = event.detail?.intersection?.point;
 
             if (intersectedPoint) {
-                // Place the model at the clicked position
+                // Step 2: Move the model to the clicked location
                 modelEntity.setAttribute("position", `${intersectedPoint.x} ${intersectedPoint.y} ${intersectedPoint.z}`);
             } else {
-                // Fallback position (near the marker)
+                // Step 3: Fallback to default position
                 modelEntity.setAttribute("position", "0 0 0");
             }
 
-            // Make the model visible
-            modelEntity.setAttribute("visible", "true");
+            // Step 4: Make the model fully visible
+            modelEntity.setAttribute("material", "opacity: 1; transparent: false");
         });
 
-        // Gesture Handler to allow manipulation of the model
+        // Gesture Handler for moving, scaling, and rotating the model
         AFRAME.registerComponent("gesture-handler", {
             schema: {
                 enabled: { default: true }
