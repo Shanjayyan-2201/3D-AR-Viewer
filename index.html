@@ -3,6 +3,7 @@
 <head>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe-gesture-detector-component/dist/aframe-gesture-detector.min.js"></script>
 </head>
 <body>
     <a-scene embedded arjs>
@@ -11,11 +12,13 @@
             <a-asset-item id="model" src="./result.gltf"></a-asset-item>
         </a-assets>
 
-        <!-- 3D Model (Hidden initially) -->
+        <!-- 3D Model (Hidden Initially) -->
         <a-entity id="modelEntity" 
                   gltf-model="#model" 
                   visible="false" 
-                  scale="1 1 1">
+                  scale="1 1 1" 
+                  gesture-handler
+                  rotation="0 0 0">
         </a-entity>
 
         <!-- AR Marker -->
@@ -23,17 +26,71 @@
     </a-scene>
 
     <script>
-        // Add click event listener to the scene
+        // Step 1: Add click event listener to the scene
         document.querySelector("a-scene").addEventListener("click", (event) => {
             const modelEntity = document.querySelector("#modelEntity");
 
-            // Get the clicked position in the scene
+            // Step 2: Get the clicked position in the scene
             const intersectedPoint = event.detail.intersection && event.detail.intersection.point;
 
             if (intersectedPoint) {
-                // Set the model's position to the clicked location
+                // Step 3: Set the model's position to the clicked location
                 modelEntity.setAttribute("position", `${intersectedPoint.x} ${intersectedPoint.y} ${intersectedPoint.z}`);
                 modelEntity.setAttribute("visible", "true"); // Make the model visible
+            }
+        });
+
+        // Step 4: Add gesture handling to allow move, scale, and rotate
+        AFRAME.registerComponent("gesture-handler", {
+            schema: {
+                enabled: { default: true }
+            },
+            init: function () {
+                const el = this.el;
+
+                // Add event listeners for gestures
+                el.sceneEl.addEventListener("onefingerstart", () => {
+                    this.initialPosition = el.getAttribute("position");
+                });
+
+                el.sceneEl.addEventListener("onefingermove", (event) => {
+                    if (!this.initialPosition) return;
+
+                    // Move the model
+                    const deltaX = event.detail.positionChange.x;
+                    const deltaY = event.detail.positionChange.y;
+                    el.setAttribute("position", {
+                        x: this.initialPosition.x + deltaX,
+                        y: this.initialPosition.y + deltaY,
+                        z: this.initialPosition.z
+                    });
+                });
+
+                el.sceneEl.addEventListener("twofingerstart", () => {
+                    this.initialScale = el.getAttribute("scale");
+                });
+
+                el.sceneEl.addEventListener("twofingermove", (event) => {
+                    if (!this.initialScale) return;
+
+                    // Scale the model
+                    const scaleFactor = 1 + event.detail.spreadChange / 100;
+                    el.setAttribute("scale", {
+                        x: this.initialScale.x * scaleFactor,
+                        y: this.initialScale.y * scaleFactor,
+                        z: this.initialScale.z * scaleFactor
+                    });
+                });
+
+                el.sceneEl.addEventListener("twofingermove", (event) => {
+                    // Rotate the model
+                    const rotation = el.getAttribute("rotation");
+                    el.setAttribute("rotation", {
+                        x: rotation.x,
+                        y: rotation.y + event.detail.spreadChange,
+                        z: rotation.z
+                    });
+                });
             }
         });
     </script>
