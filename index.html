@@ -17,8 +17,8 @@
                   gltf-model="#model" 
                   visible="false" 
                   scale="1 1 1" 
-                  gesture-handler
-                  rotation="0 0 0">
+                  rotation="0 0 0"
+                  gesture-handler>
         </a-entity>
 
         <!-- AR Marker -->
@@ -26,21 +26,25 @@
     </a-scene>
 
     <script>
-        // Step 1: Add click event listener to the scene
         document.querySelector("a-scene").addEventListener("click", (event) => {
             const modelEntity = document.querySelector("#modelEntity");
 
-            // Step 2: Get the clicked position in the scene
-            const intersectedPoint = event.detail.intersection && event.detail.intersection.point;
+            // Check for intersection or fallback to default placement
+            const intersectedPoint = event.detail?.intersection?.point;
 
             if (intersectedPoint) {
-                // Step 3: Set the model's position to the clicked location
+                // Place the model at the clicked position
                 modelEntity.setAttribute("position", `${intersectedPoint.x} ${intersectedPoint.y} ${intersectedPoint.z}`);
-                modelEntity.setAttribute("visible", "true"); // Make the model visible
+            } else {
+                // Fallback position (near the marker)
+                modelEntity.setAttribute("position", "0 0 0");
             }
+
+            // Make the model visible
+            modelEntity.setAttribute("visible", "true");
         });
 
-        // Step 4: Add gesture handling to allow move, scale, and rotate
+        // Gesture Handler to allow manipulation of the model
         AFRAME.registerComponent("gesture-handler", {
             schema: {
                 enabled: { default: true }
@@ -48,7 +52,7 @@
             init: function () {
                 const el = this.el;
 
-                // Add event listeners for gestures
+                // Add gesture listeners
                 el.sceneEl.addEventListener("onefingerstart", () => {
                     this.initialPosition = el.getAttribute("position");
                 });
