@@ -12,12 +12,13 @@
             <a-asset-item id="model" src="./result.gltf"></a-asset-item>
         </a-assets>
 
-        <!-- 3D Model (Partially visible initially) -->
-        <a-entity id="modelEntity" 
-                  gltf-model="#model" 
+        <!-- 3D Model -->
+        <a-entity id="modelEntity"
+                  gltf-model="#model"
                   position="0 0 0"
                   scale="1 1 1"
                   material="opacity: 0.5; transparent: true" 
+                  visible="true"
                   gesture-handler>
         </a-entity>
 
@@ -26,21 +27,24 @@
     </a-scene>
 
     <script>
-        document.querySelector("a-scene").addEventListener("click", (event) => {
-            const modelEntity = document.querySelector("#modelEntity");
+        const modelEntity = document.querySelector("#modelEntity");
 
-            // Step 1: Get the clicked position in the scene
+        // Initially, the model is semi-transparent
+        modelEntity.setAttribute("material", "opacity: 0.5; transparent: true");
+
+        // Listen for clicks in the scene
+        document.querySelector("a-scene").addEventListener("click", (event) => {
             const intersectedPoint = event.detail?.intersection?.point;
 
             if (intersectedPoint) {
-                // Step 2: Move the model to the clicked location
+                // Place the model at the clicked location
                 modelEntity.setAttribute("position", `${intersectedPoint.x} ${intersectedPoint.y} ${intersectedPoint.z}`);
             } else {
-                // Step 3: Fallback to default position
+                // Fallback: Place the model at the center if no intersection
                 modelEntity.setAttribute("position", "0 0 0");
             }
 
-            // Step 4: Make the model fully visible
+            // Make the model fully visible
             modelEntity.setAttribute("material", "opacity: 1; transparent: false");
         });
 
@@ -52,15 +56,16 @@
             init: function () {
                 const el = this.el;
 
-                // Add gesture listeners
-                el.sceneEl.addEventListener("onefingerstart", () => {
-                    this.initialPosition = el.getAttribute("position");
-                });
+                // Variables for tracking gestures
+                this.initialPosition = null;
+                this.initialScale = null;
+                this.initialRotation = null;
 
+                // Dragging (Move the model)
                 el.sceneEl.addEventListener("onefingermove", (event) => {
-                    if (!this.initialPosition) return;
-
-                    // Move the model
+                    if (!this.initialPosition) {
+                        this.initialPosition = el.getAttribute("position");
+                    }
                     const deltaX = event.detail.positionChange.x;
                     const deltaY = event.detail.positionChange.y;
                     el.setAttribute("position", {
@@ -70,6 +75,12 @@
                     });
                 });
 
+                el.sceneEl.addEventListener("onefingerend", () => {
+                    // Reset the initial position after moving
+                    this.initialPosition = el.getAttribute("position");
+                });
+
+                // Pinch/Spread (Scale the model)
                 el.sceneEl.addEventListener("twofingerstart", () => {
                     this.initialScale = el.getAttribute("scale");
                 });
@@ -77,7 +88,7 @@
                 el.sceneEl.addEventListener("twofingermove", (event) => {
                     if (!this.initialScale) return;
 
-                    // Scale the model
+                    // Calculate scaling factor
                     const scaleFactor = 1 + event.detail.spreadChange / 100;
                     el.setAttribute("scale", {
                         x: this.initialScale.x * scaleFactor,
@@ -86,14 +97,31 @@
                     });
                 });
 
-                el.sceneEl.addEventListener("twofingermove", (event) => {
-                    // Rotate the model
-                    const rotation = el.getAttribute("rotation");
+                el.sceneEl.addEventListener("twofingerend", () => {
+                    // Reset the initial scale after scaling
+                    this.initialScale = el.getAttribute("scale");
+                });
+
+                // Rotate the model
+                el.sceneEl.addEventListener("rotationstart", () => {
+                    this.initialRotation = el.getAttribute("rotation");
+                });
+
+                el.sceneEl.addEventListener("rotationmove", (event) => {
+                    if (!this.initialRotation) return;
+
+                    // Rotate around the Y-axis (horizontal rotation)
+                    const deltaRotation = event.detail.rotationChange;
                     el.setAttribute("rotation", {
-                        x: rotation.x,
-                        y: rotation.y + event.detail.spreadChange,
-                        z: rotation.z
+                        x: this.initialRotation.x,
+                        y: this.initialRotation.y + deltaRotation,
+                        z: this.initialRotation.z
                     });
+                });
+
+                el.sceneEl.addEventListener("rotationend", () => {
+                    // Reset the initial rotation after rotating
+                    this.initialRotation = el.getAttribute("rotation");
                 });
             }
         });
